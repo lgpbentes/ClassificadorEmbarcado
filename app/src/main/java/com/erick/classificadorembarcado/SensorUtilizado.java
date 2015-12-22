@@ -17,6 +17,7 @@ public class SensorUtilizado {
     private float desvio;
     private float janela[];
 
+
     public SensorUtilizado(){
         this.janela = new float[10];
     }

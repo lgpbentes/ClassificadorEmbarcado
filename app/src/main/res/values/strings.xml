@@ -16,5 +16,7 @@
     <string name="txt_nao_tem_bluetooth">Seu dispositivo não tem Bluetooth</string>
     <string name="txt_nao_conectou">Não foi possivel conectar</string>
     <string name="txt_erro_criar_conexao">"Erro creating Bluetooth! : "</string>
+    <string name="txt_acao_carregar_algoritmo">Carregar Algoritmo</string>
+    <string name="txt_acao_resetar_algoritmo">Resetar Algoritmo</string>
 
 </resources>

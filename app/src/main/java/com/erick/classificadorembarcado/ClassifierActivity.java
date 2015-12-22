@@ -7,13 +7,11 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +61,11 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
     private boolean conectado = false;
 
     /**
+     * Responsável por informar se um arquivo .model foi carregado ou não.
+     */
+    private boolean algoritmo = false;
+
+    /**
      * Armazena o nome do Bluetooth
      */
 
@@ -89,6 +92,7 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
     private WekaHelper wekaHelper = null;
     public Globals globalInstance = Globals.getInstance();
     private ManagerWeka managerWeka;
+    private EditText editTextModelo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -108,6 +112,8 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
 
         this.textViewDado = (TextView) findViewById(R.id.txt_dado);
         this.textViewDado.setText(R.string.txt_campo_dado_padrao);
+
+        this.editTextModelo = (EditText) findViewById(R.id.editTextModelo);
 
     }
 
@@ -129,7 +135,6 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
                 Intent habilitarBluet = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(habilitarBluet, 1);
             } else {
-                //sgetPairedDevices();
                 mBluetoothAdapter.startDiscovery();
             }
         }
@@ -142,47 +147,80 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
         return true;
     }
 
+    /**
+     * Método responsável por habilitar e desabilitar itens do Menu.
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if(algoritmo) {
+            menu.getItem(2).setEnabled(false); //carrega algoritmo
+            menu.getItem(3).setEnabled(true);  //reseta algoritmo
+            if (conectado) {
+                menu.getItem(0).setEnabled(false); //conecta com o bluetooth
+                menu.getItem(1).setEnabled(true);  //desconecta o bluetooth
+            } else {
+                menu.getItem(0).setEnabled(true);  //conecta com o bluetooth
+                menu.getItem(1).setEnabled(false); //desconecta o bluetooth
+            }
+        }else{
+            menu.getItem(2).setEnabled(true);  //carrega algoritmo
+            menu.getItem(3).setEnabled(false);  //reseta algoritmo
+
+            menu.getItem(0).setEnabled(false); //conecta com o bluetooth
+            menu.getItem(1).setEnabled(false); //desconecta o bluetooth
+
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == R.id.action_connect) {
-            try {
-                this.conectarComBluetoohArduino();
-            }catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), R.string.txt_nao_conectou, Toast.LENGTH_LONG).show();
-            }
+        switch (item.getItemId()) {
+            case R.id.action_connect:
+                try {
+                    this.conectarComBluetoohArduino();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), R.string.txt_nao_conectou, Toast.LENGTH_LONG).show();
+                }
 
-            if (conectado) {
-                Log.d("EU", getString(R.string.txt_status_conectado));
-                sendMessage(MENSAGEM_ATIVACAO);
-                beginListenForData();
-            }
+                if (conectado) {
+                    Log.d("EU", getString(R.string.txt_status_conectado));
+                    sendMessage(MENSAGEM_ATIVACAO);
+                    item.setEnabled(false);
+                    beginListenForData();
+                }
+
+            break;
+
+            case R.id.action_disconnect:
+                desconectarBluetoothDoArduino();
+            break;
+
+            case R.id.action_load_model:
+                File outPath = getWekaDirectory(ClassifierActivity.WEKA_DIRECTORY);
+
+                ClassifierActivity.modelName = editTextModelo.getText().toString();
+                File dataFile = new File(outPath, ClassifierActivity.modelName);
+                Log.d(TAG, "weka model to load: " + dataFile.getAbsolutePath());
+                if (wekaHelper == null) {
+                    wekaHelper = new WekaHelper(this);
+                }
+                if (dataFile.exists()) {
+                    wekaHelper.loadModel(dataFile.getAbsolutePath());
+                } else
+                    Toast.makeText(this, "Model doesn't exist. ABORT!", Toast.LENGTH_SHORT).show();
+            break;
+            case R.id.action_reset_model:
+                algoritmo = false;
+            break;
         }
 
-        if (id == R.id.action_disconnect) {
-            desconectarBluetoothDoArduino();
-        }
-
-        if (id == R.id.action_bluetooth) {
-            onClickListBluetooth(MenuItemCompat.getActionView(item));
-        }
-
-        if (id == R.id.action_load_model) {
-            File outPath = getWekaDirectory(ClassifierActivity.WEKA_DIRECTORY);
-
-            ClassifierActivity.modelName = "algoritmo.model";
-            File dataFile = new File(outPath, ClassifierActivity.modelName);
-            Log.d(TAG, "weka model to load: " + dataFile.getAbsolutePath());
-            if (wekaHelper == null) {
-                wekaHelper = new WekaHelper(this);
-            }
-            if (dataFile.exists()) {
-                wekaHelper.loadModel(dataFile.getAbsolutePath());
-            } else
-                Toast.makeText(this, "Model doesn't exist. ABORT!", Toast.LENGTH_SHORT).show();
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -269,26 +307,6 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
         }
     }
 
-    public void onClickListBluetooth(View view) {
-
-        if (!mBluetoothAdapter.isEnabled()){
-            Intent habilitarBluet = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(habilitarBluet, 1);
-
-        }   else {
-            try {
-                mBluetoothSocket.close();
-            } catch (Exception e) { e.printStackTrace();}
-
-            //Intent intent = new Intent(this, ChoosingGsr.class);
-            //intent.putExtra("statusAccelerometer",""+FlagAccelerometer);
-            // FlagAccelerometer = false;
-            //startActivity(intent);
-            finish();
-
-        }
-    }
-
     void beginListenForData()
     {
         final Handler handler = new Handler();
@@ -331,8 +349,12 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
                                             String array[] = data.split(",");
                                             Log.d("Valores", "" + array.length);
                                             if(array.length == 8) {
-
-                                                textView.setText(managerWeka.classificar(array));
+                                                try {
+                                                    textView.setText(managerWeka.classificar(array));
+                                                }catch (Exception e){
+                                                    /*Deve ter ocorrido algum erro em uma das instancias recebidas do arduino, não se
+                                                    preocupe a proxima vem direito. :)*/
+                                                }
                                             }
 
 
@@ -373,12 +395,12 @@ public class ClassifierActivity extends ActionBarActivity implements WekaHelper.
     @Override
     public void onWekaModelLoaded(Classifier model) {
         if (model == null) {
-            Log.d(TAG, "ruhroh");
             Toast.makeText(this, "Erro enquanto tentava carregar o modelo. ", Toast.LENGTH_SHORT).show();
         } else {
             globalInstance.setActiveModel(model);
             Log.d(TAG, "retreived model: " + model.toString());
             Toast.makeText(this, "Model loaded", Toast.LENGTH_SHORT).show();
+            algoritmo = true;
         }
     }
 

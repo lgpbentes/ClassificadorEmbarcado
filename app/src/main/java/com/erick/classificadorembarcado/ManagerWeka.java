@@ -40,7 +40,7 @@ public class ManagerWeka {
      * Método responsável por classificar uma instancia no formato de um array de Strings.
      * @param dados
      */
-    public String classificar(String[] dados){
+    public String classificar(String[] dados)throws Exception{
 
         double[] sensores = new double[dados.length];
         for(int i=0;i < dados.length; i++){
@@ -98,8 +98,9 @@ public class ManagerWeka {
         atributos.add(new Attribute(" orientacao2"));
 
         FastVector fvClassVal = new FastVector();
-        fvClassVal.addElement("Sentado - MMA7361");
         fvClassVal.addElement("Parado - MMA7361");
+        fvClassVal.addElement("Sentado - MMA7361");
+        fvClassVal.addElement("Andando - MMA7361");
 
 
         atributos.add(new Attribute("Label", fvClassVal));

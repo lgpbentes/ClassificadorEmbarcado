@@ -7,8 +7,8 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_disconnect" android:title="@string/txt_acao_desconectar"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_bluetooth" android:title="@string/txt_acao_menu_lista_dispositivos"
+    <item android:id="@+id/action_load_model" android:title="@string/txt_acao_carregar_algoritmo"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/action_load_model" android:title="Carregar Model"
+    <item android:id="@+id/action_reset_model" android:title="@string/txt_acao_resetar_algoritmo"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>
