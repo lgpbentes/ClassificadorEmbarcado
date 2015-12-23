@@ -1,4 +1,4 @@
-package wekatools;
+package com.eribeiro.classificardorembarcado.wekatools;
 
 import android.content.Context;
 import android.os.AsyncTask;

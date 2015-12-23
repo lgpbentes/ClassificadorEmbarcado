@@ -1,4 +1,4 @@
-package com.erick.classificadorembarcado;
+package com.eribeiro.classificardorembarcado;
 
 import weka.classifiers.Classifier;
 

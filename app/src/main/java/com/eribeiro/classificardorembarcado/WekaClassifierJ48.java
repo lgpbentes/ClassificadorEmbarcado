@@ -1,4 +1,4 @@
-package com.erick.classificadorembarcado;
+package com.eribeiro.classificardorembarcado;
 import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -33,14 +33,14 @@ class WekaWrapper extends Classifier {
      * @return the capabilities
      */
     public Capabilities getCapabilities() {
-        weka.core.Capabilities result = new weka.core.Capabilities(this);
+        Capabilities result = new Capabilities(this);
 
-        result.enable(weka.core.Capabilities.Capability.NOMINAL_ATTRIBUTES);
-        result.enable(weka.core.Capabilities.Capability.NUMERIC_ATTRIBUTES);
-        result.enable(weka.core.Capabilities.Capability.DATE_ATTRIBUTES);
-        result.enable(weka.core.Capabilities.Capability.MISSING_VALUES);
-        result.enable(weka.core.Capabilities.Capability.NOMINAL_CLASS);
-        result.enable(weka.core.Capabilities.Capability.MISSING_CLASS_VALUES);
+        result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
+        result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
+        result.enable(Capabilities.Capability.DATE_ATTRIBUTES);
+        result.enable(Capabilities.Capability.MISSING_VALUES);
+        result.enable(Capabilities.Capability.NOMINAL_CLASS);
+        result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
 
         result.setMinimumNumberInstances(0);
 

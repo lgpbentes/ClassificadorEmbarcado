@@ -1,4 +1,4 @@
-package com.erick.classificadorembarcado;
+package com.eribeiro.classificardorembarcado;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.eribeiro.classificardorembarcado.wekatools.WekaHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import weka.classifiers.Classifier;
-import wekatools.WekaHelper;
-
 
 public class ClassifierActivity extends ActionBarActivity implements WekaHelper.WekaHelperListerner{
 

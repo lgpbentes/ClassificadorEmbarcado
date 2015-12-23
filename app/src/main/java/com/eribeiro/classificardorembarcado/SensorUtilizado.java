@@ -1,4 +1,4 @@
-package com.erick.classificadorembarcado;
+package com.eribeiro.classificardorembarcado;
 
 import android.hardware.Sensor;
 
